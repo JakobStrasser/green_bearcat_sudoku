@@ -1,0 +1,98 @@
+﻿@using BlazorBootstrap;
+
+<div class="d-block">
+    <Button @onclick="OnShowModalClick" Disabled="@Locked">
+        @if (Value > 0 && Value < 10)
+        {
+            @Value
+        }
+    </Button>
+</div>
+
+<Modal @ref="modal" Title="Pick a number" Size="ModalSize.Small" ModalType="ModalType.Secondary">
+    <BodyTemplate>
+        <table>
+            <tbody>
+                <tr>
+                    <td><Button @onclick=" () => {Value = 1; OnHideModalClick();}" Disabled="@IsAvailable(1)">1</Button></td>
+                    <td><Button @onclick=" () => {Value = 2; OnHideModalClick();}" Disabled="@IsAvailable(2)">2</Button></td>
+                    <td><Button @onclick=" () => {Value = 3; OnHideModalClick();}" Disabled="@IsAvailable(3)">3</Button></td>
+                </tr>
+                <tr>
+                    <td><Button @onclick=" () => {Value = 4; OnHideModalClick();}" Disabled="@IsAvailable(4)">4</Button></td>
+                    <td><Button @onclick=" () => {Value = 5; OnHideModalClick();}" Disabled="@IsAvailable(5)">5</Button></td>
+                    <td><Button @onclick=" () => {Value = 6; OnHideModalClick();}" Disabled="@IsAvailable(6)">6</Button></td>
+                </tr>
+                <tr>
+                    <td><Button @onclick=" () => {Value = 7; OnHideModalClick();}" Disabled="@IsAvailable(7)">7</Button></td>
+                    <td><Button @onclick=" () => {Value = 8; OnHideModalClick();}" Disabled="@IsAvailable(8)">8</Button></td>
+                    <td><Button @onclick=" () => {Value = 9; OnHideModalClick();}" Disabled="@IsAvailable(9)">9</Button></td>
+                </tr>
+            </tbody>
+        </table>
+        <Button @onclick=" () => {Value = -1; OnHideModalClick();}">Clear</Button>
+    </BodyTemplate>
+</Modal>
+
+@code {
+    [Parameter]
+    public int Value { get; set; }
+    [Parameter]
+    public bool Locked { get; set; }
+    [Parameter]
+    public int Index { get; set; }
+
+    [Parameter]
+    public List<int>? AvailableNumbers { get; set; }
+
+    [Parameter]
+    public EventCallback<CellValueArgs> OnClickCallback { get; set; }
+
+    private Modal modal;
+
+    protected override void OnInitialized()
+    {
+        //modal = new Modal();
+    }
+
+    private async Task OnShowModalClick()
+    {
+
+        await modal?.ShowAsync();
+    }
+    private async Task OnHideModalClick()
+    {
+
+        CellValueArgs args = new CellValueArgs()
+            {
+                CellIndex = Index,
+                CellValue = Value
+            };
+        OnClickCallback.InvokeAsync(args);
+        await modal?.HideAsync();
+    }
+    public bool IsAvailable(int number)
+    {
+        return !(AvailableNumbers is not null && AvailableNumbers.Contains(number));
+    }
+
+    public EventCallback ClickButton(int clickedNumber)
+    {
+        Value = clickedNumber;
+
+        CellValueArgs args = new CellValueArgs()
+            {
+                CellIndex = Index,
+                CellValue = Value
+            };
+        OnClickCallback.InvokeAsync(args);
+        OnHideModalClick();
+        return EventCallback.Factory.Create(this, () => { });
+    }
+
+    public void ClickClear()
+    {
+        Value = -1;
+        OnHideModalClick();
+    }
+}

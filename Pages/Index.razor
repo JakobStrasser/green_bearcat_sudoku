@@ -1,0 +1,23 @@
+﻿@page "/"
+
+<PageTitle>Index</PageTitle>
+
+<h1>Play Sudoku</h1>
+<div class="d-flex">
+    <SudokuBoard Cells="@Board"></SudokuBoard>
+</div>
+
+@code {
+    public int[]? Board;
+
+    protected override void OnInitialized()
+    {
+        //Init Board
+        Board = new int[81];
+        for (int i = 0; i < Board.Length; i++)
+            Board[i] = -1;
+        Board[0] = 1;
+        Board[1] = 2;
+        Board[21] = 9;
+    }
+}

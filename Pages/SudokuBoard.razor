@@ -1,0 +1,265 @@
+﻿
+
+<div class="d-block">
+    <table>
+        <tbody>
+            @foreach (int r in Rows.Keys)
+            {
+                <tr>
+                    @foreach (int c in Rows[r])
+                    {
+                        <td class="d-md-table-cell" id="@c" @onclick="() => ClickCell(c)">
+                            <SudokuCell Index="@c" Value="@Cells[c]" Locked="@LockedCells[c]" AvailableNumbers="@AvailableNumbersInCell(c)" OnClickCallback="@CellValueChanged"></SudokuCell>
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+   
+     <div class="d-block">
+        @if (Victory)
+        {
+            <h2>You Won The Game!</h2>
+        }
+        else
+        {
+            <h2>Keep playing!</h2>
+        }
+    </div>
+    
+</div>
+
+
+
+@code {
+    [Parameter]
+    public int[]? Cells { get; set; }
+    public bool[] LockedCells = new bool[81];
+    public int? ClickedCell;
+    public bool Victory = false;
+
+    public Dictionary<int, int[]> Groups = new Dictionary<int, int[]>();
+    public Dictionary<int, int[]> Rows = new Dictionary<int, int[]>();
+    public Dictionary<int, int[]> Columns = new Dictionary<int, int[]>();
+
+    protected override void OnInitialized()
+    {
+        GenerateColumns();
+        GenerateRows();
+        GenerateGroups();
+        if (Cells is null)
+        {
+            Cells = new int[81];
+            for (int i = 0; i < Cells.Length && i < LockedCells.Length; i++)
+            {
+                Cells[i] = -1;
+                LockedCells[i] = false;
+            }
+
+        }
+        else
+        {
+            for (int i = 0; i < Cells.Length && i < LockedCells.Length; i++)
+            {
+                if (Cells[i] != -1)
+                    LockedCells[i] = true;
+                else
+                    LockedCells[i] = false;
+            }
+        }
+        Victory = CheckVictory(); //Check if already won
+    }
+
+    public void ClickCell(int? cell)
+    {
+        if (cell is not null)
+        {
+            ClickedCell = cell;
+        }
+        StateHasChanged();
+    }
+    public void GenerateGroups()
+    {
+        int[] currentGroup = { 0, 1, 2, 9, 10, 11, 18, 19, 20 };
+        Groups.Add(1, currentGroup);
+        currentGroup = new int[] { 3, 4, 5, 12, 13, 14, 21, 22, 23 };
+        Groups.Add(2, currentGroup);
+        currentGroup = new int[] { 6, 7, 8, 15, 16, 17, 24, 25, 26 };
+        Groups.Add(3, currentGroup);
+
+        currentGroup = new int[] { 27, 28, 29, 36, 37, 38, 45, 46, 47 };
+        Groups.Add(4, currentGroup);
+        currentGroup = new int[] { 30, 31, 32, 39, 40, 41, 48, 49, 50 };
+        Groups.Add(5, currentGroup);
+        currentGroup = new int[] { 33, 34, 35, 42, 43, 44, 51, 52, 53 };
+        Groups.Add(6, currentGroup);
+
+        currentGroup = new int[] { 54, 55, 56, 63, 64, 65, 72, 73, 74 };
+        Groups.Add(7, currentGroup);
+        currentGroup = new int[] { 57, 58, 59, 66, 67, 68, 75, 76, 77 };
+        Groups.Add(8, currentGroup);
+        currentGroup = new int[] { 60, 61, 62, 69, 70, 71, 78, 79, 80 };
+        Groups.Add(9, currentGroup);
+    }
+
+    public void GenerateRows()
+    {
+        int[] currentRow = { 0, 1, 2, 3, 4, 5, 6, 7, 8 };
+        Rows.Add(1, currentRow);
+        currentRow = new int[] { 9, 10, 11, 12, 13, 14, 15, 16, 17 };
+        Rows.Add(2, currentRow);
+        currentRow = new int[] { 18, 19, 20, 21, 22, 23, 24, 25, 26 };
+        Rows.Add(3, currentRow);
+
+        currentRow = new int[] { 27, 28, 29, 30, 31, 32, 33, 34, 35 };
+        Rows.Add(4, currentRow);
+        currentRow = new int[] { 36, 37, 38, 39, 40, 41, 42, 43, 44 };
+        Rows.Add(5, currentRow);
+        currentRow = new int[] { 45, 46, 47, 48, 49, 50, 51, 52, 53 };
+        Rows.Add(6, currentRow);
+
+        currentRow = new int[] { 54, 55, 56, 57, 58, 59, 60, 61, 62 };
+        Rows.Add(7, currentRow);
+        currentRow = new int[] { 63, 64, 65, 66, 67, 68, 69, 70, 71 };
+        Rows.Add(8, currentRow);
+        currentRow = new int[] { 72, 73, 74, 75, 76, 77, 78, 79, 80 };
+        Rows.Add(9, currentRow);
+    }
+    public void GenerateColumns()
+    {
+        int[] currentColumn = { 0, 9, 18, 27, 36, 45, 54, 63, 72 };
+        Columns.Add(1, currentColumn);
+        currentColumn = new int[] { 1, 10, 19, 28, 37, 46, 55, 64, 73 };
+        Columns.Add(2, currentColumn);
+        currentColumn = new int[] { 2, 11, 20, 29, 38, 47, 56, 65, 74 };
+        Columns.Add(3, currentColumn);
+
+        currentColumn = new int[] { 3, 12, 21, 30, 39, 48, 57, 66, 75 };
+        Columns.Add(4, currentColumn);
+        currentColumn = new int[] { 4, 13, 22, 31, 40, 49, 58, 67, 76 };
+        Columns.Add(5, currentColumn);
+        currentColumn = new int[] { 5, 14, 23, 32, 41, 50, 59, 68, 77 };
+        Columns.Add(6, currentColumn);
+
+        currentColumn = new int[] { 6, 15, 24, 33, 42, 51, 60, 69, 78 };
+        Columns.Add(7, currentColumn);
+        currentColumn = new int[] { 7, 16, 25, 34, 43, 52, 61, 70, 79 };
+        Columns.Add(8, currentColumn);
+        currentColumn = new int[] { 8, 17, 26, 35, 44, 53, 62, 71, 80 };
+        Columns.Add(9, currentColumn);
+    }
+
+    public int GetGroup(int? cell)
+    {
+        if (cell is null)
+            return -1;
+        foreach (int i in Groups.Keys)
+        {
+            if (Groups[i].Any(g => g == cell))
+                return i;
+        }
+        return -1;
+    }
+
+    public int GetRow(int? cell)
+    {
+        if (cell is null)
+            return -1;
+        foreach (int i in Rows.Keys)
+        {
+            if (Rows[i].Any(g => g == cell))
+                return i;
+        }
+        return -1;
+    }
+
+    public int GetColumn(int? cell)
+    {
+        if (cell is null)
+            return -1;
+        foreach (int i in Columns.Keys)
+        {
+            if (Columns[i].Any(g => g == cell))
+                return i;
+        }
+        return -1;
+    }
+
+    public List<int> AvailableNumbersInCell(int? cell)
+    {
+        if (cell is null)
+            return new List<int>();
+        List<int> numbers = new List<int>() { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+        foreach (int r in Rows[GetRow(cell)])
+        {
+            numbers.Remove(Cells[r]);
+        }
+        foreach (int c in Columns[GetColumn(cell)])
+        {
+            numbers.Remove(Cells[c]);
+        }
+        foreach (int g in Groups[GetGroup(cell)])
+        {
+            numbers.Remove(Cells[g]);
+        }
+        return numbers;
+    }
+
+    public void CellValueChanged(CellValueArgs args)
+    {
+        if (Cells is not null && args.CellIndex < Cells.Length)
+        {
+            Cells[args.CellIndex] = args.CellValue;
+        }
+        Victory = CheckVictory();
+    }
+
+    public bool CheckVictory()
+    {
+        //Rows
+        List<int> numbers;
+        foreach (int rowKey in Rows.Keys)
+        {
+            numbers = new List<int>() { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+            foreach (int r in Rows[rowKey])
+            {
+                if (numbers.Contains(Cells[r]))
+                    numbers.Remove(Cells[r]);
+                else
+                    return false;
+            }
+            if (numbers.Count != 0)
+                return false;
+        }
+        //Columns
+        foreach (int colKey in Columns.Keys)
+        {
+            numbers = new List<int>() { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+            foreach (int c in Columns[colKey])
+            {
+                if (numbers.Contains(Cells[c]))
+                    numbers.Remove(Cells[c]);
+                else
+                    return false;
+            }
+            if (numbers.Count != 0)
+                return false;
+        }
+        //Groups
+        foreach (int groupKey in Groups.Keys)
+        {
+            numbers = new List<int>() { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+            foreach (int g in Groups[groupKey])
+            {
+                if (numbers.Contains(Cells[g]))
+                    numbers.Remove(Cells[g]);
+                else
+                    return false;
+            }
+            if (numbers.Count != 0)
+                return false;
+        }
+        return true;
+    }
+}
