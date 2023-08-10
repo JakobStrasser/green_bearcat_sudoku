@@ -17,7 +17,15 @@
         </tbody>
     </table>
    
-     <div class="d-block m-md-3">
+    
+    <div class="m-md-3">
+        <Button class="btn btn-primary" @onclick="@SolveSudoku">Solve it!</Button>
+    </div>
+    <div class="m-md-3">
+        <Button class="btn btn-secondary" @onclick="@ResetSudoku">Reset it!</Button>
+    </div>
+
+    <div class="d-block m-md-3">
         @if (Victory)
         {
             <h2>You Won The Game!</h2>
@@ -27,9 +35,6 @@
             <h2>Keep playing!</h2>
         }
     </div>
-    <div>
-        <Button @onclick="@SolveSudoku">Solve it!</Button>
-    </div>
 </div>
 
 
@@ -38,6 +43,7 @@
     [Parameter]
     public int[]? Cells { get; set; }
     public bool[] LockedCells = new bool[81];
+    private int[]? InitialCells;
     public int? ClickedCell;
     public bool Victory = false;
 
@@ -69,6 +75,11 @@
                 else
                     LockedCells[i] = false;
             }
+        }
+        //Prepare reset
+        InitialCells = new int[Cells.Length];
+        for (int i = 0; i< Cells.Length;i++) {
+            InitialCells[i] = Cells[i];
         }
         Victory = CheckVictory(); //Check if already won
     }
@@ -271,6 +282,13 @@
         if (solver.Solve())
             CheckVictory();
 
+        StateHasChanged();
+    }
+
+    public void ResetSudoku()
+    {
+        for(int i = 0; i< Cells.Length; i++)
+            Cells[i] = InitialCells[i];
         StateHasChanged();
     }
 }
