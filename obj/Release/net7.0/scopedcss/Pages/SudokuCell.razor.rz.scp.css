@@ -1,0 +1,19 @@
+body[b-99qign27vo] {
+}
+.SudokuCell[b-99qign27vo] {
+    text-align: center;
+    border: 1px solid black;
+    height: 30px;
+    width: 30px;
+}
+
+input[b-99qign27vo]::-webkit-outer-spin-button,
+input[b-99qign27vo]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Firefox */
+input[type=number][b-99qign27vo] {
+    -moz-appearance: textfield;
+}
