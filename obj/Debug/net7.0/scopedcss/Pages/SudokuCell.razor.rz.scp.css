@@ -1,10 +1,17 @@
 body[b-99qign27vo] {
 }
+
 .SudokuCell[b-99qign27vo] {
     text-align: center;
     border: 1px solid black;
     height: 30px;
     width: 30px;
+}
+
+.SudokuButton[b-99qign27vo] {
+   
+    height: 28px;
+    width: 28px;
 }
 
 input[b-99qign27vo]::-webkit-outer-spin-button,

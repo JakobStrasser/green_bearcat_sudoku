@@ -1,7 +1,7 @@
 ﻿@using BlazorBootstrap;
 
 <div class="d-block">
-    <Button @onclick="OnShowModalClick" Disabled="@Locked">
+    <Button class="@btnClass" @onclick="OnShowModalClick" Disabled="@Locked">
         @if (Value > 0 && Value < 10)
         {
             @Value
@@ -49,6 +49,8 @@
     public EventCallback<CellValueArgs> OnClickCallback { get; set; }
 
     private Modal modal;
+
+    public string btnClass { get => Locked ? "btn btn-secondary SudokuButton" : "btn btn-primary SudokuButton"; }
 
     protected override void OnInitialized()
     {

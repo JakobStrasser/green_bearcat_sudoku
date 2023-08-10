@@ -1,5 +1,15 @@
 ﻿body {
 }
+table {
+    border: 3px solid black;
+    width: 270px;
+    height: 270px;
+}
+
+tr {
+    width: 270px;
+    height: 30px;
+}
 
 td { border: 1px solid black;
      height: 30px;

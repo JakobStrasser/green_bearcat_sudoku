@@ -3,6 +3,16 @@
 /* _content/Sudoku/Pages/SudokuBoard.razor.rz.scp.css */
 body[b-4uy7wyga4h] {
 }
+table[b-4uy7wyga4h] {
+    border: 3px solid black;
+    width: 270px;
+    height: 270px;
+}
+
+tr[b-4uy7wyga4h] {
+    width: 270px;
+    height: 30px;
+}
 
 td[b-4uy7wyga4h] { border: 1px solid black;
      height: 30px;
@@ -11,11 +21,18 @@ td[b-4uy7wyga4h] { border: 1px solid black;
 /* _content/Sudoku/Pages/SudokuCell.razor.rz.scp.css */
 body[b-99qign27vo] {
 }
+
 .SudokuCell[b-99qign27vo] {
     text-align: center;
     border: 1px solid black;
     height: 30px;
     width: 30px;
+}
+
+.SudokuButton[b-99qign27vo] {
+   
+    height: 28px;
+    width: 28px;
 }
 
 input[b-99qign27vo]::-webkit-outer-spin-button,

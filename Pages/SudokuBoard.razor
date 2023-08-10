@@ -1,14 +1,14 @@
 ﻿
 
-<div class="d-block">
+<div class="d-block m-md-3">
     <table>
         <tbody>
             @foreach (int r in Rows.Keys)
             {
-                <tr>
+                <tr class="">
                     @foreach (int c in Rows[r])
                     {
-                        <td class="d-md-table-cell" id="@c" @onclick="() => ClickCell(c)">
+                        <td class="d-md-table-cell p-sm-1" id="@c" @onclick="() => ClickCell(c)">
                             <SudokuCell Index="@c" Value="@Cells[c]" Locked="@LockedCells[c]" AvailableNumbers="@AvailableNumbersInCell(c)" OnClickCallback="@CellValueChanged"></SudokuCell>
                         </td>
                     }
@@ -17,7 +17,7 @@
         </tbody>
     </table>
    
-     <div class="d-block">
+     <div class="d-block m-md-3">
         @if (Victory)
         {
             <h2>You Won The Game!</h2>
