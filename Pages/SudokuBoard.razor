@@ -16,15 +16,20 @@
             }
         </tbody>
     </table>
-   
-    
+
+
     <div class="m-md-3">
         <Button class="btn btn-primary" @onclick="@SolveSudoku">Solve it!</Button>
     </div>
     <div class="m-md-3">
-        <Button class="btn btn-secondary" @onclick="@ResetSudoku">Reset it!</Button>
+        <Button class="btn btn-secondary" @onclick="@ResetSudoku">Reset to start</Button>
     </div>
-
+    <div class="m-md-3">
+        <Button class="btn btn-secondary" @onclick="@MarkAsStart">Mark as start</Button>
+    </div>
+    <div class="m-md-3">
+        <Button class="btn btn-secondary" @onclick="@ClearBoard">Ckear board</Button>
+    </div>
     <div class="d-block m-md-3">
         @if (Victory)
         {
@@ -42,6 +47,7 @@
 @code {
     [Parameter]
     public int[]? Cells { get; set; }
+
     public bool[] LockedCells = new bool[81];
     private int[]? InitialCells;
     public int? ClickedCell;
@@ -78,10 +84,11 @@
         }
         //Prepare reset
         InitialCells = new int[Cells.Length];
-        for (int i = 0; i< Cells.Length;i++) {
+        for (int i = 0; i < Cells.Length; i++)
+        {
             InitialCells[i] = Cells[i];
         }
-        Victory = CheckVictory(); //Check if already won
+        // Victory = CheckVictory(); //Check if already won
     }
 
     public void ClickCell(int? cell)
@@ -230,6 +237,7 @@
 
     public bool CheckVictory()
     {
+
         //Rows
         List<int> numbers;
         foreach (int rowKey in Rows.Keys)
@@ -278,17 +286,41 @@
 
     public void SolveSudoku()
     {
-        SudokuSolver solver = new SudokuSolver() { Board = Cells};
+        SudokuSolver solver = new SudokuSolver() { Board = Cells };
         if (solver.Solve())
-            CheckVictory();
+            Victory =  CheckVictory();
 
         StateHasChanged();
     }
 
     public void ResetSudoku()
     {
-        for(int i = 0; i< Cells.Length; i++)
+        for (int i = 0; i < Cells.Length; i++)
             Cells[i] = InitialCells[i];
         StateHasChanged();
+    }
+
+    public void MarkAsStart()
+    {
+        if (Cells is not null)
+        {
+            InitialCells = new int[Cells.Length];
+            for (int i = 0; i < Cells.Length; i++)
+            {
+                InitialCells[i] = Cells[i];
+                LockedCells[i] = Cells[i] == -1;
+            }
+        }
+    }
+
+    public void ClearBoard()
+    {
+        if (Cells is not null)
+            for (int i = 0; i < Cells.Length; i++)
+            {
+                Cells[i] = -1;
+                LockedCells[i] = false;
+            }
+
     }
 }
