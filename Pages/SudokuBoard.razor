@@ -99,6 +99,8 @@
         }
         StateHasChanged();
     }
+
+    #region Definitions
     public void GenerateGroups()
     {
         int[] currentGroup = { 0, 1, 2, 9, 10, 11, 18, 19, 20 };
@@ -169,7 +171,7 @@
         currentColumn = new int[] { 8, 17, 26, 35, 44, 53, 62, 71, 80 };
         Columns.Add(9, currentColumn);
     }
-
+    #endregion
     public int GetGroup(int? cell)
     {
         if (cell is null)
@@ -311,6 +313,7 @@
                 LockedCells[i] = Cells[i] == -1;
             }
         }
+        StateHasChanged();
     }
 
     public void ClearBoard()
@@ -321,6 +324,6 @@
                 Cells[i] = -1;
                 LockedCells[i] = false;
             }
-
+            StateHasChanged();
     }
 }
