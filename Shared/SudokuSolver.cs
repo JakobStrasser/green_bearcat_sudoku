@@ -16,7 +16,7 @@ namespace Sudoku.Shared
             // If there are no empty cells left, the puzzle is solved
             if (emptyCellIndex == -1)
                 return true;
-
+            int currentIndex = emptyCellIndex;
             for (int num = 1; num <= 9; num++)
             {
                 if (IsSafe(board, emptyCellIndex, num))
@@ -25,9 +25,10 @@ namespace Sudoku.Shared
 
                     if (SolveSudoku(board))
                         return true; // If puzzle can be solved recursively
+                    
 
                     // If placing the current number leads to an incorrect solution, backtrack
-                    board[emptyCellIndex] = 0;
+                    board[emptyCellIndex] = -1;
                 }
             }
 
