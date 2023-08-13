@@ -1,6 +1,6 @@
 ﻿
 
-<div class="d-block m-md-3">
+<div class="d-block m-lg-3">
     <table>
         <tbody>
             @foreach (int r in Rows.Keys)
@@ -18,29 +18,32 @@
     </table>
 
 
-    <div class="m-md-3">
-        <Button class="btn btn-primary" @onclick="@SolveSudoku">Solve it!</Button>
-    </div>
-    <div class="m-md-3">
-        <Button class="btn btn-secondary" @onclick="@ResetSudoku">Reset to start</Button>
-    </div>
-    <div class="m-md-3">
-        <Button class="btn btn-secondary" @onclick="@MarkAsStart">Mark as start</Button>
-    </div>
-    <div class="m-md-3">
-        <Button class="btn btn-secondary" @onclick="@ClearBoard">Ckear board</Button>
-    </div>
-    <div class="d-block m-md-3">
-        @if (Victory)
-        {
-            <h2>You Won The Game!</h2>
-        }
-        else
-        {
-            <h2>Keep playing!</h2>
-        }
+    <div class="btn-group m-lg-3" role="group">
+        <div class="">
+            <Button class="btn btn-primary" @onclick="@SolveSudoku">Solve it!</Button>
+        </div>
+        <div class="">
+            <Button class="btn btn-success" @onclick="@MarkAsStart">Mark as start</Button>
+        </div>
+        <div class="">
+            <Button class="btn btn-warning" @onclick="@ResetSudoku">Reset to start</Button>
+        </div>
+        <div class="">
+            <Button class="btn btn-danger" @onclick="@ClearBoard">Ckear board</Button>
+        </div>
     </div>
 </div>
+<div class="d-block m-md-3">
+    @if (Victory)
+    {
+        <h2>You Won The Game!</h2>
+    }
+    else
+    {
+        <h2>Keep playing!</h2>
+    }
+</div>
+
 
 
 
@@ -290,15 +293,25 @@
     {
         SudokuSolver solver = new SudokuSolver() { Board = Cells };
         if (solver.Solve())
-            Victory =  CheckVictory();
+            Victory = CheckVictory();
 
         StateHasChanged();
     }
 
     public void ResetSudoku()
     {
-        for (int i = 0; i < Cells.Length; i++)
-            Cells[i] = InitialCells[i];
+        if (Cells is not null)
+        {
+            if (InitialCells is null)
+                InitialCells = new int[Cells.Length];
+            for (int i = 0; i < Cells.Length; i++)
+            {
+
+                Cells[i] = InitialCells[i];
+                LockedCells[i] = Cells[i] != -1;
+
+            }
+        }
         StateHasChanged();
     }
 
@@ -310,7 +323,7 @@
             for (int i = 0; i < Cells.Length; i++)
             {
                 InitialCells[i] = Cells[i];
-                LockedCells[i] = Cells[i] == -1;
+                LockedCells[i] = Cells[i] != -1;
             }
         }
         StateHasChanged();
@@ -324,6 +337,6 @@
                 Cells[i] = -1;
                 LockedCells[i] = false;
             }
-            StateHasChanged();
+        StateHasChanged();
     }
 }

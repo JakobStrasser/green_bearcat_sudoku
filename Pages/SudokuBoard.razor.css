@@ -1,10 +1,17 @@
 body {
 }
 
+btn {
+    border-radius: 20px;
+    background: linear-gradient(145deg, #f0f0f0, #cacaca);
+    box-shadow: 18px 18px 36px #bebebe, -18px -18px 36px #ffffff;
+}
+
 table {
     border: 3px solid black;
     width: 270px;
     height: 270px;
+  
 }
 
     tr:nth-child(3n+3) {
