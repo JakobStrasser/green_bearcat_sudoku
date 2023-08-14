@@ -1,4 +1,4 @@
-﻿
+﻿@inject IHttpClientFactory ClientFactory
 
 <div class="d-block m-lg-3">
     <table>
@@ -19,18 +19,17 @@
 
 
     <div class="btn-group m-lg-3" role="group">
-        <div class="">
-            <Button class="btn btn-primary" @onclick="@SolveSudoku">Solve it!</Button>
-        </div>
-        <div class="">
-            <Button class="btn btn-success" @onclick="@MarkAsStart">Mark as start</Button>
-        </div>
-        <div class="">
-            <Button class="btn btn-warning" @onclick="@ResetSudoku">Reset to start</Button>
-        </div>
-        <div class="">
-            <Button class="btn btn-danger" @onclick="@ClearBoard">Ckear board</Button>
-        </div>
+        <Button class="btn btn-primary" @onclick="@SolveSudoku">Solve it!</Button>
+        <Button class="btn btn-success" @onclick="@MarkAsStart">Mark as start</Button>
+        <Button class="btn btn-warning" @onclick="@ResetSudoku">Reset to start</Button>
+        <Button class="btn btn-danger" @onclick="@ClearBoard">Clear board</Button>
+    </div>
+    <p>Generate new puzzle:</p>
+    <div class="btn-group m-lg-3" role="group">
+        <Button class="btn btn-success" @onclick="@NewBoardEasy">Easy</Button>
+        <Button class="btn btn-warning" @onclick="@NewBoardMedium">Medium</Button>
+        <Button class="btn btn-danger" @onclick="@NewBoardHard">Hard</Button>
+
     </div>
 </div>
 <div class="d-block m-md-3">
@@ -52,6 +51,7 @@
     public int[]? Cells { get; set; }
 
     public bool[] LockedCells = new bool[81];
+    private int[]? Solution;
     private int[]? InitialCells;
     public int? ClickedCell;
     public bool Victory = false;
@@ -291,10 +291,19 @@
 
     public void SolveSudoku()
     {
-        SudokuSolver solver = new SudokuSolver() { Board = Cells };
-        if (solver.Solve())
-            Victory = CheckVictory();
-
+        if (Solution is null && Cells is not null)
+        {
+            SudokuSolver solver = new SudokuSolver() { Board = Cells };
+        }
+        else
+        {
+            if (Solution is not null && Cells is not null)
+                for (int i = 0; i < Cells.Length; i++)
+                {
+                    Cells[i] = Solution[i];
+                }
+        }
+        Victory = CheckVictory();
         StateHasChanged();
     }
 
@@ -332,11 +341,79 @@
     public void ClearBoard()
     {
         if (Cells is not null)
+        {
             for (int i = 0; i < Cells.Length; i++)
             {
                 Cells[i] = -1;
                 LockedCells[i] = false;
             }
+            Solution = null;
+        }
+        StateHasChanged();
+    }
+    public async Task<bool> NewBoard(string difficulty)
+    {
+
+        int[] board = new int[81];
+        var client = ClientFactory.CreateClient();
+        var uri = new Uri("https://sudoku-api.vercel.app/api/dosuku"); //?query={newboard(limit:1){grids{" + difficulty + "}}}
+
+        var response = await client.GetAsync(uri);
+        if (response.IsSuccessStatusCode)
+        {
+            var data = await response.Content.ReadFromJsonAsync<ApiResponse.Root>();
+
+            if (data is not null)
+            {
+                InitialCells = new int[Cells.Length];
+                int index = 0;
+                foreach (List<int> row in data.newboard.grids[0].value)
+                {
+                    foreach (int value in row)
+                    {
+                        Cells[index] = value != 0 ? value : -1; //Change 0 to -1
+                        InitialCells[index] = Cells[index];
+                        LockedCells[index] = Cells[index] != -1;
+
+                        index++;
+                    }
+                }
+
+                Solution = new int[81];
+                index = 0;
+                foreach (List<int> row in data.newboard.grids[0].solution)
+                {
+                    foreach (int value in row)
+                    {
+                        Solution[index] = value != 0 ? value : -1; //Change 0 to -1
+
+                        index++;
+                    }
+                }
+            }
+        }
+        else
+        {
+        }
+        return true;
+
+    }
+
+    public async void NewBoardEasy()
+    {
+        await NewBoard("Easy");
+        StateHasChanged();
+    }
+    public async void NewBoardMedium()
+    {
+        await NewBoard("Medium");
+        StateHasChanged();
+    }
+    public async void NewBoardHard()
+    {
+        await NewBoard("Hard");
         StateHasChanged();
     }
 }
+
+
