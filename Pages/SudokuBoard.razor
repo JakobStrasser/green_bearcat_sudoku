@@ -1,4 +1,5 @@
 ﻿@inject IHttpClientFactory ClientFactory
+@inject ILocalStorageService _localstorage;
 
 <div class="d-block m-lg-3">
     <table>
@@ -65,33 +66,67 @@
         GenerateColumns();
         GenerateRows();
         GenerateGroups();
-        if (Cells is null)
-        {
-            Cells = new int[81];
-            for (int i = 0; i < Cells.Length && i < LockedCells.Length; i++)
-            {
-                Cells[i] = -1;
-                LockedCells[i] = false;
-            }
 
-        }
-        else
+        StateHasChanged();
+
+    }
+
+    protected async override void OnAfterRender(bool firstRender)
+    {
+        try
         {
-            for (int i = 0; i < Cells.Length && i < LockedCells.Length; i++)
+            if (firstRender && Cells is not null) //Load from localstorage or clear board
             {
-                if (Cells[i] != -1)
-                    LockedCells[i] = true;
-                else
-                    LockedCells[i] = false;
+                var savedBoard = await _localstorage.GetItemAsync<int[]>("SudokuBoard");
+
+                if (savedBoard is not null)
+                {
+                    for (int i = 0; i < Cells.Length && i < LockedCells.Length; i++)
+                    {
+                        Cells[i] = savedBoard[i];
+
+                    }
+                } else //Display clear board
+                {
+                    for (int i = 0; i < Cells.Length && i < LockedCells.Length; i++)
+                    {
+                        Cells[i] = -1;
+
+                    }
+                }
+                var lockedBoard = await _localstorage.GetItemAsync<bool[]>("LockedBoard");
+                if( lockedBoard is not null)
+                {
+                    for (int i = 0; i < Cells.Length && i < LockedCells.Length; i++)
+                    {
+                        LockedCells[i] = lockedBoard[i];
+
+                    }
+                }
+                var initialBoard = await _localstorage.GetItemAsync<int[]>("InitialBoard");
+                InitialCells = new int[81];
+                if (initialBoard is not null)
+                {
+                    for (int i = 0; i < Cells.Length && i < LockedCells.Length; i++)
+                    {
+                        InitialCells[i] = initialBoard[i];
+
+                    }
+                }
+                StateHasChanged();
             }
+           
+            if(Cells is not null)
+                await _localstorage.SetItemAsync<int[]>("SudokuBoard", Cells);
+            if(LockedCells is not null)
+                await _localstorage.SetItemAsync<bool[]>("LockedBoard", LockedCells);
+            if(InitialCells is not null)
+                await _localstorage.SetItemAsync<int[]>("InitialBoard", InitialCells);
         }
-        //Prepare reset
-        InitialCells = new int[Cells.Length];
-        for (int i = 0; i < Cells.Length; i++)
+        catch(Exception ex)
         {
-            InitialCells[i] = Cells[i];
+            throw;
         }
-        // Victory = CheckVictory(); //Check if already won
     }
 
     public void ClickCell(int? cell)
