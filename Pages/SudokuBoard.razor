@@ -402,16 +402,19 @@
     public async void NewBoardEasy()
     {
         await NewBoard("Easy");
+        Victory = CheckVictory();
         StateHasChanged();
     }
     public async void NewBoardMedium()
     {
         await NewBoard("Medium");
+        Victory = CheckVictory();
         StateHasChanged();
     }
     public async void NewBoardHard()
     {
         await NewBoard("Hard");
+        Victory = CheckVictory();
         StateHasChanged();
     }
 }
